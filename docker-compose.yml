@@ -40,7 +40,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-      
+
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
@@ -48,10 +48,11 @@ services:
     ports:
       - "9000:9000"
     environment:
-      KAFKA_BROKER_CONNECT: kafka:9092
+      KAFKA_BROKER_CONNECT: host.docker.internal:9092
       JVM_OPTS: "-Xms32M -Xmx64M"
     depends_on:
       - kafka
+
 
 volumes:
   pgdata:
