@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
+    image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -12,7 +12,7 @@ services:
       - "2181:2181"
 
   kafka:
-    image: confluentinc/cp-kafka:7.4.0
+    image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
     depends_on:
       - zookeeper
@@ -22,33 +22,37 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      
 
   postgres:
     image: postgres:15
     container_name: postgres
+    restart: always
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: joshi
       POSTGRES_PASSWORD: password
       POSTGRES_DB: documentdb
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
 
-  minio:
-    image: minio/minio
-    container_name: minio
-    environment:
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+      
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: always
     ports:
       - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
+    environment:
+      KAFKA_BROKER_CONNECT: kafka:9092
+      JVM_OPTS: "-Xms32M -Xmx64M"
+    depends_on:
+      - kafka
 
 volumes:
-  postgres_data:
-  minio_data:
+  pgdata:
+
