@@ -40,6 +40,18 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+   mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: joshi
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodata:/data/db
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -55,3 +67,4 @@ services:
 
 volumes:
   pgdata:
+  mongodata:
